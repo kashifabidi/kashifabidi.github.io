@@ -818,18 +818,67 @@
     <!-- Isotope  -->
     <script src="assets/vendors/isotope/isotope.pkgd.js"></script>
     
-    <!-- Google maps -->
+    <!-- Google maps + places -->
     <script>
-        function initMap() {
+        async function initMap() {
             var location = { lat: 28.6807, lng: 77.3152 };
             var map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 15,
-                center: location
+                center: location,
+                scrollwheel: false,
+                styles: [
+                    { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+                    { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+                    { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+                    { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }] },
+                    { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }] },
+                    { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#263c3f" }] },
+                    { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#6b9a76" }] },
+                    { featureType: "road", elementType: "geometry", stylers: [{ color: "#38414e" }] },
+                    { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#212a37" }] },
+                    { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#9ca5b3" }] },
+                    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#746855" }] },
+                    { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#1f2835" }] },
+                    { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#f3d19c" }] },
+                    { featureType: "transit", elementType: "geometry", stylers: [{ color: "#2f3948" }] },
+                    { featureType: "transit.station", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }] },
+                    { featureType: "water", elementType: "geometry", stylers: [{ color: "#17263c" }] },
+                    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#515c6d" }] },
+                    { featureType: "water", elementType: "labels.text.stroke", stylers: [{ color: "#17263c" }] }
+                ]
             });
-            new google.maps.Marker({ position: location, map: map });
+            var marker = new google.maps.Marker({ position: location, map: map });
+
+            var { PlaceAutocompleteElement } = await google.maps.importLibrary("places");
+            var placeAutocomplete = new PlaceAutocompleteElement();
+            placeAutocomplete.style.cssText = "margin:10px;width:280px;max-width:70vw;";
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(placeAutocomplete);
+
+            var infoWindow = new google.maps.InfoWindow();
+
+            placeAutocomplete.addEventListener("gmp-select", async function (event) {
+                var place = event.placePrediction.toPlace();
+                await place.fetchFields({ fields: ["displayName", "formattedAddress", "location", "rating"] });
+                if (!place.location) return;
+
+                marker.setPosition(place.location);
+                map.setCenter(place.location);
+                map.setZoom(16);
+
+                var info = "<strong>" + (place.displayName || "") + "</strong>";
+                if (place.formattedAddress) info += "<br>" + place.formattedAddress;
+                if (place.rating) info += "<br>Rating: " + place.rating + " &#9733;";
+                infoWindow.setContent(info);
+                infoWindow.open(map, marker);
+            });
+
+            marker.addListener("click", function () {
+                infoWindow.setContent("<strong>Mohammad Kashif Abidi</strong><br>F 119 Second Floor Block-F Dilshad Colony Delhi 110095 India.");
+                infoWindow.open(map, marker);
+            });
         }
     </script>
-	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCtme10pzgKSPeJVJrG1O3tjR6lk98o4w8&callback=initMap"></script>
+	<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCtme10pzgKSPeJVJrG1O3tjR6lk98o4w8&libraries=places&v=weekly&callback=initMap"></script>
 
     <!-- JohnDoe js -->
     <script src="assets/js/johndoe.js"></script>
