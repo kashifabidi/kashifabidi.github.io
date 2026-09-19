@@ -781,7 +781,17 @@
     <!-- Isotope  -->
     <script src="assets/vendors/isotope/isotope.pkgd.js"></script>
     
-    <!-- Google mpas -->
+    <!-- Google maps -->
+    <script>
+        function initMap() {
+            var location = { lat: -33.8688, lng: 151.2093 };
+            var map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 15,
+                center: location
+            });
+            new google.maps.Marker({ position: location, map: map });
+        }
+    </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCtme10pzgKSPeJVJrG1O3tjR6lk98o4w8&callback=initMap"></script>
 
     <!-- JohnDoe js -->
